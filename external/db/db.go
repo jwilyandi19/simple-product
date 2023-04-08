@@ -8,17 +8,17 @@ import (
 	"gorm.io/gorm"
 )
 
-type DB struct {
+type SQLDatabase struct {
 	Database *gorm.DB
 }
 
-func InitDBConnection(conf helper.DBConfig) (DB, error) {
-	conn := fmt.Sprintf("%s:%s@tcp(%s)/%s", conf.Username, conf.Password, conf.Host, conf.DB)
+func InitDBConnection(conf helper.DBConfig) (SQLDatabase, error) {
+	conn := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", conf.Username, conf.Password, conf.Host, conf.DB)
 	db, err := gorm.Open(mysql.Open(conn), &gorm.Config{})
 	if err != nil {
-		return DB{}, err
+		return SQLDatabase{}, err
 	}
-	return DB{
+	return SQLDatabase{
 		Database: db,
 	}, nil
 }
