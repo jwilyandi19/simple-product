@@ -1,1 +1,3 @@
 DROP TABLE IF EXISTS orders_item;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS order_histories;
