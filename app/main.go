@@ -3,7 +3,9 @@ package main
 import (
 	"io"
 	"os"
+	"strconv"
 
+	"github.com/jwilyandi19/simple-product/external/cache"
 	"github.com/jwilyandi19/simple-product/external/db"
 	"github.com/jwilyandi19/simple-product/handler"
 	"github.com/jwilyandi19/simple-product/helper"
@@ -36,25 +38,31 @@ func main() {
 	if err != nil {
 		log.Fatal("can't load config")
 	}
+	redisPort, _ := strconv.Atoi(config.RedisPort)
+	dbPort, _ := strconv.Atoi(config.DBPort)
 
 	dbConfig := helper.DBConfig{
 		Host:     config.DBHost,
 		Password: config.DBPassword,
 		Username: config.DBUsername,
 		DB:       config.DBName,
+		Port:     dbPort,
 	}
+	ttl, _ := strconv.Atoi(config.RedisTTL)
 
-	// redisConfig := helper.RedisConfig{
-	// 	Server:   config.RedisHost,
-	// 	Password: config.RedisPassword,
-	// }
+	redisConfig := helper.RedisConfig{
+		Server:   config.RedisHost,
+		Password: config.RedisPassword,
+		TTL:      ttl,
+		Port:     redisPort,
+	}
 
 	dbConn, err := db.InitDBConnection(dbConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	//redisConn := cache.InitCacheConnection(redisConfig)
+	redisConn := cache.InitCacheConnection(redisConfig)
 
 	mainServer := echo.New()
 	mainServer.Use(middleware.Recover())
@@ -64,9 +72,9 @@ func main() {
 	userRoutes := mainServer.Group("user")
 	orderRoutes := mainServer.Group("order")
 
-	productRepo := productRepo.NewProductRepository(dbConn)
-	userRepo := userRepo.NewUserRepository(dbConn)
-	orderRepo := orderRepo.NewOrderRepository(dbConn)
+	productRepo := productRepo.NewProductRepository(dbConn, redisConn)
+	userRepo := userRepo.NewUserRepository(dbConn, redisConn)
+	orderRepo := orderRepo.NewOrderRepository(dbConn, redisConn)
 
 	productUsecase := productUsecase.NewProductUsecase(productRepo)
 	userUsecase := userUsecase.NewUserUsecase(userRepo)
@@ -76,7 +84,7 @@ func main() {
 	handler.NewUserHandler(userRoutes, userUsecase)
 	handler.NewOrderHandler(orderRoutes, orderUsecase)
 
-	port := ":8080"
+	port := ":" + config.Port
 	mainServer.Start(port)
 
 }

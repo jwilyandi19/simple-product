@@ -13,7 +13,7 @@ type SQLDatabase struct {
 }
 
 func InitDBConnection(conf helper.DBConfig) (SQLDatabase, error) {
-	conn := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", conf.Username, conf.Password, conf.Host, conf.DB)
+	conn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", conf.Username, conf.Password, conf.Host, conf.Port, conf.DB)
 	db, err := gorm.Open(mysql.Open(conn), &gorm.Config{})
 	if err != nil {
 		return SQLDatabase{}, err

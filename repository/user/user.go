@@ -1,19 +1,27 @@
 package user
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
+
+	"github.com/gomodule/redigo/redis"
 	domain "github.com/jwilyandi19/simple-product/domain/user"
+	"github.com/jwilyandi19/simple-product/external/cache"
 	"github.com/jwilyandi19/simple-product/external/db"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
 type userRepository struct {
-	db db.SQLDatabase
+	db    db.SQLDatabase
+	cache cache.Cache
 }
 
-func NewUserRepository(db db.SQLDatabase) domain.UserRepository {
+func NewUserRepository(db db.SQLDatabase, cache cache.Cache) domain.UserRepository {
 	return &userRepository{
-		db: db,
+		db:    db,
+		cache: cache,
 	}
 }
 
@@ -48,6 +56,11 @@ func (p *userRepository) Create(req domain.CreateUserRequest) (bool, error) {
 		log.Errorf("[Create-User-Repository] %s", err.Error())
 		return false, err
 	}
+	key := fmt.Sprintf("user:%d", arg.ID)
+	err = p.setCache(key, arg, p.cache.TTL)
+	if err != nil {
+		log.Warnf("[Create-User-Repository] redis-set: %s", err.Error())
+	}
 	return true, nil
 }
 
@@ -55,10 +68,23 @@ func (p *userRepository) GetById(id int) (domain.User, error) {
 	var user domain.User
 	db := p.db.Database
 
-	err := db.Scopes(UserTable()).First(&user, id).Error
+	key := fmt.Sprintf("user:%d", id)
+	cachedData, err := p.getCache(key)
+	if err != nil {
+		log.Warnf("[GetById-User-Repository] redis-get: %s", err.Error())
+	} else if cachedData != (domain.User{}) {
+		return cachedData, nil
+	}
+
+	err = db.Scopes(UserTable()).First(&user, id).Error
 	if err != nil {
 		log.Errorf("[GetById-User-Repository] %s", err.Error())
 		return domain.User{}, err
+	}
+
+	err = p.setCache(key, user, p.cache.TTL)
+	if err != nil {
+		log.Warnf("[GetById-Product-Repository] redis-set: %s", err.Error())
 	}
 	return user, nil
 }
@@ -82,6 +108,12 @@ func (p *userRepository) Update(req domain.UpdateUserRequest) (bool, error) {
 		return false, err
 	}
 
+	key := fmt.Sprintf("user:%d", user.ID)
+	err = p.setCache(key, user, p.cache.TTL)
+	if err != nil {
+		log.Warnf("[Update-User-Repository] redis-set: %s", err.Error())
+	}
+
 	return true, nil
 }
 
@@ -95,5 +127,64 @@ func (p *userRepository) Delete(id int) (bool, error) {
 		return false, err
 	}
 
+	key := fmt.Sprintf("user:%d", id)
+	err = p.deleteCache(key)
+	if err != nil {
+		log.Warnf("[Delete-User-Repository] redis-delete: %s", err.Error())
+	}
+
 	return true, nil
+}
+
+func (p *userRepository) setCache(key string, data domain.User, ttl int) error {
+	conn := p.cache.Redis.Get()
+	defer conn.Close()
+
+	marshalledData, err := json.Marshal(&data)
+	if err != nil {
+		return errors.New("marshal error: " + err.Error())
+	}
+	_, err = conn.Do("SETEX", key, ttl, string(marshalledData))
+	if err != nil {
+		return errors.New("redis error: " + err.Error())
+	}
+
+	return nil
+}
+
+func (p *userRepository) getCache(key string) (domain.User, error) {
+	var product domain.User
+	conn := p.cache.Redis.Get()
+	defer conn.Close()
+
+	cachedData, err := redis.String(conn.Do("GET", key))
+	if err != nil {
+		if !errors.Is(err, redis.ErrNil) {
+			err = errors.New("redis error: " + err.Error())
+			return domain.User{}, err
+		}
+		return domain.User{}, nil
+	}
+	if cachedData != "" {
+		err = json.Unmarshal([]byte(cachedData), &product)
+		if err != nil {
+			return domain.User{}, err
+		}
+	}
+	return product, nil
+}
+
+func (p *userRepository) deleteCache(key string) error {
+	conn := p.cache.Redis.Get()
+	defer conn.Close()
+
+	_, err := redis.String(conn.Do("DEL", key))
+	if err != nil {
+		if !errors.Is(err, redis.ErrNil) {
+			err = errors.New("redis error: " + err.Error())
+			return err
+		}
+		return nil
+	}
+	return nil
 }

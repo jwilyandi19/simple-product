@@ -25,11 +25,11 @@ type UpdateOrderRequest struct {
 
 type Order struct {
 	ID           int             `json:"id" gorm:"primary_key;not null;auto_increment"`
-	User         user.User       `gorm:"foreignkey:user_id"`
-	UserId       int             `json:"-"`
-	OrdersItem   product.Product `gorm:"foreignkey:order_item_id"`
-	OrderItemId  int             `json:"-"`
+	User         user.User       `json:"-" gorm:"foreignkey:user_id"`
+	UserId       int             `json:"user_id"`
+	OrdersItem   product.Product `json:"-" gorm:"foreignkey:order_item_id"`
+	OrderItemId  int             `json:"order_item_id"`
 	Descriptions string          `json:"descriptions" gorm:"type:varchar(1024);"`
-	CreatedAt    time.Time       `json:"-"`
-	UpdatedAt    time.Time       `json:"-"`
+	CreatedAt    time.Time       `json:"created_at"`
+	UpdatedAt    time.Time       `json:"deleted_at"`
 }
