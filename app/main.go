@@ -40,6 +40,7 @@ func main() {
 
 	mainServer := echo.New()
 	mainServer.Use(middleware.Recover())
+	mainServer.Use(middleware.Logger())
 
 	productRoutes := mainServer.Group("product")
 	// userRoutes := mainServer.Group("user")

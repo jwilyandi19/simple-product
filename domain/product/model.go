@@ -15,6 +15,13 @@ type CreateProductRequest struct {
 type GetProductRequest struct {
 }
 
+type UpdateProductRequest struct {
+	ProductID        int
+	ProductName      string
+	ProductPrice     int
+	ProductExpiredAt time.Time
+}
+
 type Product struct {
 	ID        int            `json:"id" gorm:"primary_key;not null;auto_increment"`
 	Name      string         `json:"name" gorm:"type:varchar(1024);"`
