@@ -12,6 +12,9 @@ import (
 	userRepo "github.com/jwilyandi19/simple-product/repository/user"
 	userUsecase "github.com/jwilyandi19/simple-product/usecase/user"
 
+	orderRepo "github.com/jwilyandi19/simple-product/repository/order"
+	orderUsecase "github.com/jwilyandi19/simple-product/usecase/order"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -39,7 +42,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//redisConn := redis.InitRedisConnection(redisConfig)
+	//redisConn := cache.InitCacheConnection(redisConfig)
 
 	mainServer := echo.New()
 	mainServer.Use(middleware.Recover())
@@ -47,16 +50,19 @@ func main() {
 
 	productRoutes := mainServer.Group("product")
 	userRoutes := mainServer.Group("user")
-	// orderRoutes := mainServer.Group("order")
+	orderRoutes := mainServer.Group("order")
 
 	productRepo := productRepo.NewProductRepository(dbConn)
 	userRepo := userRepo.NewUserRepository(dbConn)
+	orderRepo := orderRepo.NewOrderRepository(dbConn)
 
 	productUsecase := productUsecase.NewProductUsecase(productRepo)
 	userUsecase := userUsecase.NewUserUsecase(userRepo)
+	orderUsecase := orderUsecase.NewOrderUsecase(orderRepo)
 
 	handler.NewProductHandler(productRoutes, productUsecase)
 	handler.NewUserHandler(userRoutes, userUsecase)
+	handler.NewOrderHandler(orderRoutes, orderUsecase)
 
 	port := ":8080"
 	mainServer.Start(port)

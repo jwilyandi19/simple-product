@@ -3,7 +3,8 @@ package order
 import (
 	"time"
 
-	"gorm.io/gorm"
+	"github.com/jwilyandi19/simple-product/domain/product"
+	"github.com/jwilyandi19/simple-product/domain/user"
 )
 
 type CreateOrderRequest struct {
@@ -23,11 +24,12 @@ type UpdateOrderRequest struct {
 }
 
 type Order struct {
-	ID        int            `json:"id" gorm:"primary_key;not null;auto_increment"`
-	Name      string         `json:"name" gorm:"type:varchar(1024);"`
-	Price     int            `json:"price" gorm:"type:int;"`
-	ExpiredAt time.Time      `json:"-"`
-	CreatedAt time.Time      `json:"-"`
-	UpdatedAt time.Time      `json:"-"`
-	DeletedAt gorm.DeletedAt `json:"-"`
+	ID           int             `json:"id" gorm:"primary_key;not null;auto_increment"`
+	User         user.User       `gorm:"foreignkey:user_id"`
+	UserId       int             `json:"-"`
+	OrdersItem   product.Product `gorm:"foreignkey:order_item_id"`
+	OrderItemId  int             `json:"-"`
+	Descriptions string          `json:"descriptions" gorm:"type:varchar(1024);"`
+	CreatedAt    time.Time       `json:"-"`
+	UpdatedAt    time.Time       `json:"-"`
 }
