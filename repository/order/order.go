@@ -3,6 +3,7 @@ package order
 import (
 	domain "github.com/jwilyandi19/simple-product/domain/order"
 	"github.com/jwilyandi19/simple-product/external/db"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -29,6 +30,7 @@ func (p *orderRepository) GetAll() ([]domain.Order, error) {
 	result := db.Scopes(OrderTable()).Find(&orders)
 
 	if result.Error != nil {
+		log.Errorf("[GetAll-Order-Repository] %s", result.Error.Error())
 		return []domain.Order{}, result.Error
 	}
 
@@ -45,6 +47,7 @@ func (p *orderRepository) Create(req domain.CreateOrderRequest) (bool, error) {
 
 	err := db.Scopes(OrderTable()).Create(&arg).Error
 	if err != nil {
+		log.Errorf("[Create-Order-Repository] %s", err.Error())
 		return false, err
 	}
 	return true, nil
@@ -56,6 +59,7 @@ func (p *orderRepository) GetById(id int) (domain.Order, error) {
 
 	err := db.Scopes(OrderTable()).First(&order, id).Error
 	if err != nil {
+		log.Errorf("[GetById-Order-Repository] %s", err.Error())
 		return domain.Order{}, err
 	}
 	return order, nil
@@ -67,6 +71,7 @@ func (p *orderRepository) Update(req domain.UpdateOrderRequest) (bool, error) {
 
 	err := db.Scopes(OrderTable()).First(&order, req.OrderID).Error
 	if err != nil {
+		log.Errorf("[Update-Order-Repository] not found: %s", err.Error())
 		return false, err
 	}
 

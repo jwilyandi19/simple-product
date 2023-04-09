@@ -9,6 +9,7 @@ import (
 	domain "github.com/jwilyandi19/simple-product/domain/product"
 	"github.com/jwilyandi19/simple-product/usecase/product"
 	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 type productHandler struct {
@@ -65,6 +66,7 @@ func (h *productHandler) GetProducts(ctx echo.Context) error {
 	products, err := h.productUsecase.GetProducts(newCtx, arg)
 
 	if err != nil {
+		log.Errorf("[GetProducts-Handler] %s", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, ResponseError{
 			Error: err.Error(),
 		})
@@ -87,6 +89,7 @@ func (h *productHandler) CreateProduct(ctx echo.Context) error {
 	var req CreateProductRequest
 	err := json.NewDecoder(ctx.Request().Body).Decode(&req)
 	if err != nil {
+		log.Errorf("[CreateProduct-Handler] failed to decode: %s", err.Error())
 		return ctx.JSON(http.StatusBadRequest, ResponseError{
 			Error: err.Error(),
 		})
@@ -103,6 +106,7 @@ func (h *productHandler) CreateProduct(ctx echo.Context) error {
 	created, err := h.productUsecase.CreateProduct(newCtx, arg)
 
 	if err != nil {
+		log.Errorf("[CreateProduct-Handler] %s", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, ResponseError{
 			Error: err.Error(),
 		})
@@ -113,6 +117,7 @@ func (h *productHandler) CreateProduct(ctx echo.Context) error {
 func (h *productHandler) GetProductDetail(ctx echo.Context) error {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
+		log.Errorf("[GetProductDetail-Handler] can't get ID: %s", err.Error())
 		return ctx.JSON(http.StatusNotFound, err.Error())
 	}
 
@@ -121,6 +126,7 @@ func (h *productHandler) GetProductDetail(ctx echo.Context) error {
 	product, err := h.productUsecase.GetDetailProduct(newCtx, id)
 
 	if err != nil {
+		log.Errorf("[GetProductDetail-Handler] %s", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, ResponseError{
 			Error: err.Error(),
 		})
@@ -142,11 +148,13 @@ func (h *productHandler) UpdateProduct(ctx echo.Context) error {
 	newCtx := ctx.Request().Context()
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
+		log.Errorf("[UpdateProduct-Handler] can't get ID: %s", err.Error())
 		return ctx.JSON(http.StatusNotFound, err.Error())
 	}
 	var req UpdateProductRequest
 	err = json.NewDecoder(ctx.Request().Body).Decode(&req)
 	if err != nil {
+		log.Errorf("[UpdateProduct-Handler] failed to decode: %s", err.Error())
 		return ctx.JSON(http.StatusBadRequest, ResponseError{
 			Error: err.Error(),
 		})
@@ -164,6 +172,7 @@ func (h *productHandler) UpdateProduct(ctx echo.Context) error {
 	updated, err := h.productUsecase.UpdateProduct(newCtx, arg)
 
 	if err != nil {
+		log.Errorf("[UpdateProduct-Handler] %s", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, ResponseError{
 			Error: err.Error(),
 		})
@@ -176,6 +185,7 @@ func (h *productHandler) UpdateProduct(ctx echo.Context) error {
 func (h *productHandler) DeleteProduct(ctx echo.Context) error {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
+		log.Errorf("[DeleteProduct-Handler] can't get ID: %s", err.Error())
 		return ctx.JSON(http.StatusNotFound, err.Error())
 	}
 
@@ -184,6 +194,7 @@ func (h *productHandler) DeleteProduct(ctx echo.Context) error {
 	deleted, err := h.productUsecase.DeleteProduct(newCtx, id)
 
 	if err != nil {
+		log.Errorf("[DeleteProduct-Handler] %s", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, ResponseError{
 			Error: err.Error(),
 		})

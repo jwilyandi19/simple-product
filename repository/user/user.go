@@ -3,6 +3,7 @@ package user
 import (
 	domain "github.com/jwilyandi19/simple-product/domain/user"
 	"github.com/jwilyandi19/simple-product/external/db"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -29,6 +30,7 @@ func (p *userRepository) GetAll() ([]domain.User, error) {
 	result := db.Scopes(UserTable()).Find(&products)
 
 	if result.Error != nil {
+		log.Errorf("[GetAll-User-Repository] %s", result.Error.Error())
 		return []domain.User{}, result.Error
 	}
 
@@ -43,6 +45,7 @@ func (p *userRepository) Create(req domain.CreateUserRequest) (bool, error) {
 
 	err := db.Scopes(UserTable()).Create(&arg).Error
 	if err != nil {
+		log.Errorf("[Create-User-Repository] %s", err.Error())
 		return false, err
 	}
 	return true, nil
@@ -54,6 +57,7 @@ func (p *userRepository) GetById(id int) (domain.User, error) {
 
 	err := db.Scopes(UserTable()).First(&user, id).Error
 	if err != nil {
+		log.Errorf("[GetById-User-Repository] %s", err.Error())
 		return domain.User{}, err
 	}
 	return user, nil
@@ -65,6 +69,7 @@ func (p *userRepository) Update(req domain.UpdateUserRequest) (bool, error) {
 
 	err := db.Scopes(UserTable()).First(&user, req.UserID).Error
 	if err != nil {
+		log.Errorf("[Update-User-Repository] not found %s", err.Error())
 		return false, err
 	}
 
@@ -73,6 +78,7 @@ func (p *userRepository) Update(req domain.UpdateUserRequest) (bool, error) {
 
 	err = db.Scopes(UserTable()).Save(&user).Error
 	if err != nil {
+		log.Errorf("[Update-User-Repository] %s", err.Error())
 		return false, err
 	}
 
@@ -85,6 +91,7 @@ func (p *userRepository) Delete(id int) (bool, error) {
 
 	err := db.Scopes(UserTable()).Where("id = ?", id).Delete(&user).Error
 	if err != nil {
+		log.Errorf("[Delete-User-Repository] not found %s", err.Error())
 		return false, err
 	}
 

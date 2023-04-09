@@ -1,13 +1,15 @@
 package main
 
 import (
-	"log"
+	"io"
+	"os"
 
 	"github.com/jwilyandi19/simple-product/external/db"
 	"github.com/jwilyandi19/simple-product/handler"
 	"github.com/jwilyandi19/simple-product/helper"
 	productRepo "github.com/jwilyandi19/simple-product/repository/product"
 	productUsecase "github.com/jwilyandi19/simple-product/usecase/product"
+	log "github.com/sirupsen/logrus"
 
 	userRepo "github.com/jwilyandi19/simple-product/repository/user"
 	userUsecase "github.com/jwilyandi19/simple-product/usecase/user"
@@ -20,6 +22,16 @@ import (
 )
 
 func main() {
+	fileLog, err := os.OpenFile("simple_product.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	defer fileLog.Close()
+
+	mw := io.MultiWriter(fileLog, os.Stdout)
+
+	log.SetOutput(mw)
+	log.SetLevel(log.InfoLevel)
 	config, err := helper.LoadConfig(".")
 	if err != nil {
 		log.Fatal("can't load config")

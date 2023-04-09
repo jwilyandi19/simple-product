@@ -8,6 +8,7 @@ import (
 	domain "github.com/jwilyandi19/simple-product/domain/user"
 	"github.com/jwilyandi19/simple-product/usecase/user"
 	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 type userHandler struct {
@@ -53,6 +54,7 @@ func (h *userHandler) GetUsers(ctx echo.Context) error {
 	users, err := h.userUsecase.GetUsers(newCtx, arg)
 
 	if err != nil {
+		log.Errorf("[GetUsers-Handler] %s", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, ResponseError{
 			Error: err.Error(),
 		})
@@ -73,6 +75,7 @@ func (h *userHandler) CreateUser(ctx echo.Context) error {
 	var req CreateUserRequest
 	err := json.NewDecoder(ctx.Request().Body).Decode(&req)
 	if err != nil {
+		log.Errorf("[CreateUser-Handler] failed to decode: %s", err.Error())
 		return ctx.JSON(http.StatusBadRequest, ResponseError{
 			Error: err.Error(),
 		})
@@ -86,6 +89,7 @@ func (h *userHandler) CreateUser(ctx echo.Context) error {
 	created, err := h.userUsecase.CreateUser(newCtx, arg)
 
 	if err != nil {
+		log.Errorf("[CreateUser-Handler] %s", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, ResponseError{
 			Error: err.Error(),
 		})
@@ -96,6 +100,7 @@ func (h *userHandler) CreateUser(ctx echo.Context) error {
 func (h *userHandler) GetUserDetail(ctx echo.Context) error {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
+		log.Errorf("[GetUserDetail-Handler] can't get id: %s", err.Error())
 		return ctx.JSON(http.StatusNotFound, err.Error())
 	}
 
@@ -104,6 +109,7 @@ func (h *userHandler) GetUserDetail(ctx echo.Context) error {
 	user, err := h.userUsecase.GetDetailUser(newCtx, id)
 
 	if err != nil {
+		log.Errorf("[GetUserDetail-Handler] %s", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, ResponseError{
 			Error: err.Error(),
 		})
@@ -123,11 +129,13 @@ func (h *userHandler) UpdateUser(ctx echo.Context) error {
 	newCtx := ctx.Request().Context()
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
+		log.Errorf("[UpdateUser-Handler] can't get id: %s", err.Error())
 		return ctx.JSON(http.StatusNotFound, err.Error())
 	}
 	var req UpdateUserRequest
 	err = json.NewDecoder(ctx.Request().Body).Decode(&req)
 	if err != nil {
+		log.Errorf("[UpdateUser-Handler] failed to decode: %s", err.Error())
 		return ctx.JSON(http.StatusBadRequest, ResponseError{
 			Error: err.Error(),
 		})
@@ -141,6 +149,7 @@ func (h *userHandler) UpdateUser(ctx echo.Context) error {
 	updated, err := h.userUsecase.UpdateUser(newCtx, arg)
 
 	if err != nil {
+		log.Errorf("[UpdateUser-Handler] %s", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, ResponseError{
 			Error: err.Error(),
 		})
@@ -153,6 +162,7 @@ func (h *userHandler) UpdateUser(ctx echo.Context) error {
 func (h *userHandler) DeleteUser(ctx echo.Context) error {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
+		log.Errorf("[DeleteUser-Handler] can't get id: %s", err.Error())
 		return ctx.JSON(http.StatusNotFound, err.Error())
 	}
 
@@ -161,6 +171,7 @@ func (h *userHandler) DeleteUser(ctx echo.Context) error {
 	deleted, err := h.userUsecase.DeleteUser(newCtx, id)
 
 	if err != nil {
+		log.Errorf("[DeleteUser-Handler] %s", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, ResponseError{
 			Error: err.Error(),
 		})

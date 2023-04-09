@@ -4,6 +4,7 @@ import (
 	"context"
 
 	domain "github.com/jwilyandi19/simple-product/domain/product"
+	log "github.com/sirupsen/logrus"
 )
 
 type productUsecase struct {
@@ -27,6 +28,7 @@ func NewProductUsecase(p domain.ProductRepository) ProductUsecase {
 func (p *productUsecase) GetProducts(ctx context.Context, req domain.GetProductRequest) ([]domain.Product, error) {
 	products, err := p.productRepo.GetAll()
 	if err != nil {
+		log.Errorf("[GetProducts-Usecase] %s", err.Error())
 		return []domain.Product{}, err
 	}
 	return products, nil
@@ -35,6 +37,7 @@ func (p *productUsecase) GetProducts(ctx context.Context, req domain.GetProductR
 func (p *productUsecase) CreateProduct(ctx context.Context, req domain.CreateProductRequest) (bool, error) {
 	created, err := p.productRepo.Create(req)
 	if err != nil {
+		log.Errorf("[CreateProduct-Usecase] %s", err.Error())
 		return created, err
 	}
 	return created, nil
@@ -43,6 +46,7 @@ func (p *productUsecase) CreateProduct(ctx context.Context, req domain.CreatePro
 func (p *productUsecase) GetDetailProduct(ctx context.Context, id int) (domain.Product, error) {
 	product, err := p.productRepo.GetById(id)
 	if err != nil {
+		log.Errorf("[GetDetailProduct-Usecase] %s", err.Error())
 		return domain.Product{}, err
 	}
 	return product, nil
@@ -51,6 +55,7 @@ func (p *productUsecase) GetDetailProduct(ctx context.Context, id int) (domain.P
 func (p *productUsecase) UpdateProduct(ctx context.Context, req domain.UpdateProductRequest) (bool, error) {
 	updated, err := p.productRepo.Update(req)
 	if err != nil {
+		log.Errorf("[UpdateProduct-Usecase] %s", err.Error())
 		return updated, err
 	}
 	return updated, nil
@@ -59,6 +64,7 @@ func (p *productUsecase) UpdateProduct(ctx context.Context, req domain.UpdatePro
 func (p *productUsecase) DeleteProduct(ctx context.Context, id int) (bool, error) {
 	deleted, err := p.productRepo.Delete(id)
 	if err != nil {
+		log.Errorf("[DeleteProduct-Usecase] %s", err.Error())
 		return deleted, err
 	}
 	return deleted, nil

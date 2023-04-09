@@ -3,6 +3,7 @@ package product
 import (
 	domain "github.com/jwilyandi19/simple-product/domain/product"
 	"github.com/jwilyandi19/simple-product/external/db"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -29,6 +30,7 @@ func (p *productRepository) GetAll() ([]domain.Product, error) {
 	result := db.Scopes(ProductTable()).Find(&products)
 
 	if result.Error != nil {
+		log.Errorf("[GetAll-Product-Repository] %s", result.Error.Error())
 		return []domain.Product{}, result.Error
 	}
 
@@ -45,6 +47,7 @@ func (p *productRepository) Create(req domain.CreateProductRequest) (bool, error
 
 	err := db.Scopes(ProductTable()).Create(&arg).Error
 	if err != nil {
+		log.Errorf("[Create-Product-Repository] %s", err.Error())
 		return false, err
 	}
 	return true, nil
@@ -56,6 +59,7 @@ func (p *productRepository) GetById(id int) (domain.Product, error) {
 
 	err := db.Scopes(ProductTable()).First(&product, id).Error
 	if err != nil {
+		log.Errorf("[GetById-Product-Repository] %s", err.Error())
 		return domain.Product{}, err
 	}
 	return product, nil
@@ -67,6 +71,7 @@ func (p *productRepository) Update(req domain.UpdateProductRequest) (bool, error
 
 	err := db.Scopes(ProductTable()).First(&product, req.ProductID).Error
 	if err != nil {
+		log.Errorf("[Update-Product-Repository] not found %s", err.Error())
 		return false, err
 	}
 
@@ -77,6 +82,7 @@ func (p *productRepository) Update(req domain.UpdateProductRequest) (bool, error
 
 	err = db.Scopes(ProductTable()).Save(&product).Error
 	if err != nil {
+		log.Errorf("[Update-Product-Repository] %s", err.Error())
 		return false, err
 	}
 
@@ -89,6 +95,7 @@ func (p *productRepository) Delete(id int) (bool, error) {
 
 	err := db.Scopes(ProductTable()).Where("id = ?", id).Delete(&product).Error
 	if err != nil {
+		log.Errorf("[Delete-Product-Repository] %s", err.Error())
 		return false, err
 	}
 
