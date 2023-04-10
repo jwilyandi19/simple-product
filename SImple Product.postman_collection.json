@@ -96,14 +96,23 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/product/",
+					"raw": "localhost:8080/product?page=1&limit=1",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"product",
-						""
+						"product"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "1"
+						}
 					]
 				}
 			},
@@ -115,14 +124,23 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/user/",
+					"raw": "localhost:8080/user?page=1&limit=1",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"user",
-						""
+						"user"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "1"
+						}
 					]
 				}
 			},
