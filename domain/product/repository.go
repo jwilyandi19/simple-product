@@ -1,7 +1,7 @@
 package product
 
 type ProductRepository interface {
-	GetAll() ([]Product, error)
+	GetAll(req GetProductRequest) ([]Product, error)
 	Create(req CreateProductRequest) (bool, error)
 	GetById(id int) (Product, error)
 	Update(req UpdateProductRequest) (bool, error)

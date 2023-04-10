@@ -11,6 +11,8 @@ type CreateUserRequest struct {
 }
 
 type GetUserRequest struct {
+	Page  int
+	Limit int
 }
 
 type UpdateUserRequest struct {

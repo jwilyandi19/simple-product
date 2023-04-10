@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -52,7 +53,7 @@ func NewProductHandler(e *echo.Group, product product.ProductUsecase) {
 	handler := &productHandler{
 		productUsecase: product,
 	}
-	e.GET("/", handler.GetProducts)
+	e.GET("", handler.GetProducts)
 	e.POST("/create", handler.CreateProduct)
 	e.GET("/:id", handler.GetProductDetail)
 	e.PUT("/update/:id", handler.UpdateProduct)
@@ -62,7 +63,17 @@ func NewProductHandler(e *echo.Group, product product.ProductUsecase) {
 func (h *productHandler) GetProducts(ctx echo.Context) error {
 	newCtx := ctx.Request().Context()
 
-	arg := domain.GetProductRequest{}
+	page, _ := strconv.Atoi(ctx.QueryParam("page"))
+	limit, _ := strconv.Atoi(ctx.QueryParam("limit"))
+
+	if page <= 0 && limit <= 0 {
+		log.Errorf("[GetProducts-Handler] can't get page and limit")
+		return ctx.JSON(http.StatusBadRequest, errors.New("can't get page and limit"))
+	}
+	arg := domain.GetProductRequest{
+		Page:  page,
+		Limit: limit,
+	}
 	products, err := h.productUsecase.GetProducts(newCtx, arg)
 
 	if err != nil {

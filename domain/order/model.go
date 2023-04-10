@@ -14,6 +14,8 @@ type CreateOrderRequest struct {
 }
 
 type GetOrderRequest struct {
+	Page  int
+	Limit int
 }
 
 type UpdateOrderRequest struct {

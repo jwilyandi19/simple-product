@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -40,7 +41,7 @@ func NewUserHandler(e *echo.Group, user user.UserUsecase) {
 	handler := &userHandler{
 		userUsecase: user,
 	}
-	e.GET("/", handler.GetUsers)
+	e.GET("", handler.GetUsers)
 	e.POST("/create", handler.CreateUser)
 	e.GET("/:id", handler.GetUserDetail)
 	e.PUT("/update/:id", handler.UpdateUser)
@@ -50,7 +51,17 @@ func NewUserHandler(e *echo.Group, user user.UserUsecase) {
 func (h *userHandler) GetUsers(ctx echo.Context) error {
 	newCtx := ctx.Request().Context()
 
-	arg := domain.GetUserRequest{}
+	page, _ := strconv.Atoi(ctx.QueryParam("page"))
+	limit, _ := strconv.Atoi(ctx.QueryParam("limit"))
+
+	if page <= 0 && limit <= 0 {
+		log.Errorf("[GetUsers-Handler] can't get page and limit")
+		return ctx.JSON(http.StatusBadRequest, errors.New("can't get page and limit"))
+	}
+	arg := domain.GetUserRequest{
+		Page:  page,
+		Limit: limit,
+	}
 	users, err := h.userUsecase.GetUsers(newCtx, arg)
 
 	if err != nil {

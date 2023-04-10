@@ -31,11 +31,13 @@ func ProductTable() func(tx *gorm.DB) *gorm.DB {
 	}
 }
 
-func (p *productRepository) GetAll() ([]domain.Product, error) {
+func (p *productRepository) GetAll(req domain.GetProductRequest) ([]domain.Product, error) {
 	var products []domain.Product
 	db := p.db.Database
 
-	result := db.Scopes(ProductTable()).Find(&products)
+	offset := (req.Page - 1) * req.Limit
+
+	result := db.Offset(offset).Limit(req.Limit).Scopes(ProductTable()).Find(&products)
 
 	if result.Error != nil {
 		log.Errorf("[GetAll-Product-Repository] %s", result.Error.Error())

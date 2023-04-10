@@ -32,7 +32,7 @@ func NewOrderUsecase(o domain.OrderRepository, p product.ProductRepository, u us
 }
 
 func (p *orderUsecase) GetOrders(ctx context.Context, req domain.GetOrderRequest) ([]domain.Order, error) {
-	orders, err := p.orderRepo.GetAll()
+	orders, err := p.orderRepo.GetAll(req)
 	if err != nil {
 		log.Errorf("[GetOrders-Usecase] %s", err.Error())
 		return []domain.Order{}, err

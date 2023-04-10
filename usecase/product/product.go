@@ -26,7 +26,7 @@ func NewProductUsecase(p domain.ProductRepository) ProductUsecase {
 }
 
 func (p *productUsecase) GetProducts(ctx context.Context, req domain.GetProductRequest) ([]domain.Product, error) {
-	products, err := p.productRepo.GetAll()
+	products, err := p.productRepo.GetAll(req)
 	if err != nil {
 		log.Errorf("[GetProducts-Usecase] %s", err.Error())
 		return []domain.Product{}, err

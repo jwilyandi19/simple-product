@@ -31,11 +31,11 @@ func OrderTable() func(tx *gorm.DB) *gorm.DB {
 	}
 }
 
-func (p *orderRepository) GetAll() ([]domain.Order, error) {
+func (p *orderRepository) GetAll(req domain.GetOrderRequest) ([]domain.Order, error) {
 	var orders []domain.Order
 	db := p.db.Database
-
-	result := db.Scopes(OrderTable()).Find(&orders)
+	offset := (req.Page - 1) * req.Limit
+	result := db.Offset(offset).Limit(req.Limit).Scopes(OrderTable()).Find(&orders)
 
 	if result.Error != nil {
 		log.Errorf("[GetAll-Order-Repository] %s", result.Error.Error())

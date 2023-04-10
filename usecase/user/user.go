@@ -26,7 +26,7 @@ func NewUserUsecase(p domain.UserRepository) UserUsecase {
 }
 
 func (p *userUsecase) GetUsers(ctx context.Context, req domain.GetUserRequest) ([]domain.User, error) {
-	users, err := p.userRepo.GetAll()
+	users, err := p.userRepo.GetAll(req)
 	if err != nil {
 		log.Errorf("[GetUsers-Usecase] %s", err.Error())
 		return []domain.User{}, err

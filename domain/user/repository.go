@@ -1,7 +1,7 @@
 package user
 
 type UserRepository interface {
-	GetAll() ([]User, error)
+	GetAll(req GetUserRequest) ([]User, error)
 	Create(req CreateUserRequest) (bool, error)
 	GetById(id int) (User, error)
 	Update(req UpdateUserRequest) (bool, error)

@@ -31,11 +31,13 @@ func UserTable() func(tx *gorm.DB) *gorm.DB {
 	}
 }
 
-func (p *userRepository) GetAll() ([]domain.User, error) {
+func (p *userRepository) GetAll(req domain.GetUserRequest) ([]domain.User, error) {
 	var products []domain.User
 	db := p.db.Database
 
-	result := db.Scopes(UserTable()).Find(&products)
+	offset := (req.Page - 1) * req.Limit
+
+	result := db.Offset(offset).Limit(req.Limit).Scopes(UserTable()).Find(&products)
 
 	if result.Error != nil {
 		log.Errorf("[GetAll-User-Repository] %s", result.Error.Error())

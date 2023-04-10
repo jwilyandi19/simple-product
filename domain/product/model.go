@@ -13,6 +13,8 @@ type CreateProductRequest struct {
 }
 
 type GetProductRequest struct {
+	Page  int
+	Limit int
 }
 
 type UpdateProductRequest struct {

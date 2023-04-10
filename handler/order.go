@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -47,7 +48,7 @@ func NewOrderHandler(e *echo.Group, order order.OrderUsecase) {
 	handler := &orderHandler{
 		orderUsecase: order,
 	}
-	e.GET("/", handler.GetOrders)
+	e.GET("", handler.GetOrders)
 	e.POST("/create", handler.CreateOrder)
 	e.GET("/:id", handler.GetOrderDetail)
 	e.PUT("/update/:id", handler.UpdateOrder)
@@ -56,7 +57,17 @@ func NewOrderHandler(e *echo.Group, order order.OrderUsecase) {
 func (h *orderHandler) GetOrders(ctx echo.Context) error {
 	newCtx := ctx.Request().Context()
 
-	arg := domain.GetOrderRequest{}
+	page, _ := strconv.Atoi(ctx.QueryParam("page"))
+	limit, _ := strconv.Atoi(ctx.QueryParam("limit"))
+
+	if page <= 0 && limit <= 0 {
+		log.Errorf("[GetOrders-Handler] can't get page and limit")
+		return ctx.JSON(http.StatusBadRequest, errors.New("can't get page and limit"))
+	}
+	arg := domain.GetOrderRequest{
+		Page:  page,
+		Limit: limit,
+	}
 	orders, err := h.orderUsecase.GetOrders(newCtx, arg)
 
 	if err != nil {
