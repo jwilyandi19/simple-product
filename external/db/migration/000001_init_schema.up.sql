@@ -11,6 +11,7 @@ CREATE TABLE orders_item (
 CREATE TABLE users (
     id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     full_name varchar(1024),
+    first_order varchar(1024),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP
