@@ -33,3 +33,12 @@ type Order struct {
 	CreatedAt    time.Time       `json:"created_at"`
 	UpdatedAt    time.Time       `json:"deleted_at"`
 }
+
+type OrderResponse struct {
+	ID           int
+	UserName     string
+	ItemName     string
+	Descriptions string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}

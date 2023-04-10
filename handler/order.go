@@ -36,8 +36,8 @@ type OrderResponse struct {
 
 type OrderDetailResponse struct {
 	OrderID        int    `json:"order_id"`
-	UserID         int    `json:"user_id"`
-	ProductID      int    `json:"product_id"`
+	UserFullName   string `json:"user_full_name"`
+	ProductName    string `json:"product_name"`
 	Descriptions   string `json:"descriptions"`
 	OrderCreatedAt string `json:"order_created_at"`
 	OrderUpdatedAt string `json:"order_updated_at"`
@@ -127,8 +127,8 @@ func (h *orderHandler) GetOrderDetail(ctx echo.Context) error {
 
 	orderResponse := OrderDetailResponse{
 		OrderID:        order.ID,
-		UserID:         order.UserId,
-		ProductID:      order.OrderItemId,
+		UserFullName:   order.UserName,
+		ProductName:    order.ItemName,
 		Descriptions:   order.Descriptions,
 		OrderCreatedAt: order.CreatedAt.Format("2006-01-02 15:04:05"),
 		OrderUpdatedAt: order.UpdatedAt.Format("2006-01-02 15:04:05"),

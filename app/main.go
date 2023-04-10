@@ -78,7 +78,7 @@ func main() {
 
 	productUsecase := productUsecase.NewProductUsecase(productRepo)
 	userUsecase := userUsecase.NewUserUsecase(userRepo)
-	orderUsecase := orderUsecase.NewOrderUsecase(orderRepo)
+	orderUsecase := orderUsecase.NewOrderUsecase(orderRepo, productRepo, userRepo)
 
 	handler.NewProductHandler(productRoutes, productUsecase)
 	handler.NewUserHandler(userRoutes, userUsecase)
